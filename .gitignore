@@ -1,0 +1,40 @@
+# Build output
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+artifacts/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+*.user
+*.suo
+*.userprefs
+
+# Test and coverage
+TestResults/
+*.trx
+coverage*.xml
+
+# NuGet
+*.nupkg
+packages/
+
+# Local recordings for the evaluation corpus: never commit voice data
+recordings/
+*.wav
+
+# Local logs
+*.log
+
+# Local Claude Code permissions
+.claude/settings.local.json
+
+# Local publish output
+publish/
+
+# Local Android signing: never commit keys or their passwords
+signing/signing.props
+*.keystore
+*.jks

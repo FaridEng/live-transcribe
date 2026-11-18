@@ -1,0 +1,16 @@
+<!--
+  Optional Android signing for LiveTranscribe.Android.
+  Copy this file to signing/signing.props (ignored by Git) and fill it in. Keep the keystore itself out of Git.
+  Passwords can come from environment variables with the env: prefix, so they never sit in a file.
+  Create a key once with:
+    keytool -genkeypair -v -keystore signing/release.keystore -alias livetranscribe -keyalg RSA -keysize 2048 -validity 10000
+-->
+<Project>
+  <PropertyGroup>
+    <AndroidKeyStore>true</AndroidKeyStore>
+    <AndroidSigningKeyStore>$(MSBuildThisFileDirectory)release.keystore</AndroidSigningKeyStore>
+    <AndroidSigningKeyAlias>livetranscribe</AndroidSigningKeyAlias>
+    <AndroidSigningStorePass>env:LIVETRANSCRIBE_STORE_PASS</AndroidSigningStorePass>
+    <AndroidSigningKeyPass>env:LIVETRANSCRIBE_KEY_PASS</AndroidSigningKeyPass>
+  </PropertyGroup>
+</Project>

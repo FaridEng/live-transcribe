@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\LiveTranscribe.Core\LiveTranscribe.Core.csproj" />
+    <ProjectReference Include="..\LiveTranscribe.Engines.Gemini\LiveTranscribe.Engines.Gemini.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-android</TargetFramework>
+    <!-- Android 8: notification channels and the hint-text flag; newer APIs are guarded. -->
+    <SupportedOSPlatformVersion>26</SupportedOSPlatformVersion>
+    <!-- 32-bit ARM too: many phones run a 32-bit Android even on 64-bit chips. -->
+    <RuntimeIdentifiers>android-arm;android-arm64;android-x64</RuntimeIdentifiers>
+    <!-- v1 and v2 signatures as well as v3, for installers that do not read v3 alone. -->
+    <AndroidApkSignerAdditionalArguments>--v1-signing-enabled true --v2-signing-enabled true</AndroidApkSignerAdditionalArguments>
+    <OutputType>Exe</OutputType>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <!-- Not LiveTranscribe.Android: that namespace would hide the Android.* bindings inside the project. -->
+    <RootNamespace>LiveTranscribe.Droid</RootNamespace>
+    <AssemblyName>LiveTranscribe.Android</AssemblyName>
+    <ApplicationId>com.livetranscribe.app</ApplicationId>
+    <ApplicationTitle>LiveTranscribe</ApplicationTitle>
+    <ApplicationVersion>8</ApplicationVersion>
+    <ApplicationDisplayVersion>0.8</ApplicationDisplayVersion>
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+    <!-- Signing (architecture T17): no key is committed. Copy signing/signing.props.example to
+         signing/signing.props (ignored by Git) and point it at your own keystore, so every build from every
+         machine signs with the same key and installs as an update. Without that file, builds use this
+         machine's auto-generated %USERPROFILE%\.android\debug.keystore. -->
+    <!-- One self-contained APK that can be copied to the phone and installed, without Fast Deployment. -->
+    <EmbedAssembliesIntoApk>true</EmbedAssembliesIntoApk>
+    <!-- Settings are read with reflection-based System.Text.Json, like on Windows. -->
+    <JsonSerializerIsReflectionEnabledByDefault>true</JsonSerializerIsReflectionEnabledByDefault>
+  </PropertyGroup>
+
+  <Import Project="..\..\signing\signing.props" Condition="Exists('..\..\signing\signing.props')" />
+
+</Project>

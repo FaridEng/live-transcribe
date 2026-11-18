@@ -1,0 +1,261 @@
+<Window x:Class="LiveTranscribe.App.Windows.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="LiveTranscribe Settings"
+        Width="540" SizeToContent="Height"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+    <Window.Resources>
+        <Style x:Key="Section" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Margin" Value="0,18,0,4" />
+        </Style>
+        <Style x:Key="Label" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,8,0,4" />
+        </Style>
+        <Style x:Key="Note" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#666" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="Margin" Value="0,4,0,0" />
+        </Style>
+    </Window.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="20,6,20,20">
+        <TextBlock Text="Speech engine" Style="{StaticResource Section}" />
+        <TextBlock Text="Gemini API key (from Google AI Studio)" Style="{StaticResource Label}" />
+        <PasswordBox x:Name="ApiKeyBox" Height="26" />
+        <TextBlock x:Name="KeyStatusText" Style="{StaticResource Note}" />
+
+        <TextBlock Text="Engine profiles" Style="{StaticResource Section}" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ComboBox x:Name="ProfileBox" Height="26" DisplayMemberPath="Name"
+                      SelectionChanged="OnProfileChanged" />
+            <Button x:Name="AddProfileButton" Grid.Column="2" Content="Add" Width="70" Height="26" Click="OnAddProfile" />
+            <Button x:Name="DeleteProfileButton" Grid.Column="4" Content="Delete" Width="70" Height="26" Click="OnDeleteProfile" />
+        </Grid>
+
+        <Grid Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Profile name" Style="{StaticResource Label}" />
+                <TextBox x:Name="ProfileNameBox" Height="26" />
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="API" Style="{StaticResource Label}" />
+                <ComboBox x:Name="EngineTypeBox" Height="26" DisplayMemberPath="Name"
+                          SelectionChanged="OnEngineTypeChanged" />
+            </StackPanel>
+        </Grid>
+
+        <TextBlock Text="Model id" Style="{StaticResource Label}" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ComboBox x:Name="ModelIdBox" Height="26" IsEditable="True" IsTextSearchEnabled="False" />
+            <Button x:Name="LoadModelsButton" Grid.Column="2" Content="Load list" Width="90" Height="26"
+                    Click="OnLoadModels" />
+        </Grid>
+        <TextBlock Text="&quot;Load list&quot; asks the provider which models this key can reach with this API. You can also type an id that is not in the list: preview model names change."
+                   Style="{StaticResource Note}" />
+        <TextBlock x:Name="CapabilityNote" Style="{StaticResource Note}" />
+
+        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+            <Button x:Name="TestConnectionButton" Content="Test connection" Width="130" Height="26"
+                    Click="OnTestConnection" />
+        </StackPanel>
+        <TextBlock x:Name="TestConnectionText" Style="{StaticResource Note}" />
+
+        <Grid Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Use for dictation" Style="{StaticResource Label}" />
+                <ComboBox x:Name="ActiveProfileBox" Height="26" DisplayMemberPath="Name"
+                          SelectionChanged="OnActiveProfileChanged" />
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="Fall back to" Style="{StaticResource Label}" />
+                <ComboBox x:Name="FallbackProfileBox" Height="26" DisplayMemberPath="Name" />
+            </StackPanel>
+        </Grid>
+        <TextBlock Text="A fallback runs only when the active profile fails (quota, outage, bad key), and the switch is announced every time - a different profile can mean different data-use terms."
+                   Style="{StaticResource Note}" />
+
+        <TextBlock Text="Microphone" Style="{StaticResource Section}" />
+        <Grid Margin="0,4,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ComboBox x:Name="MicrophoneBox" Height="26" DisplayMemberPath="Name" />
+            <Button x:Name="TestMicrophoneButton" Grid.Column="2" Content="Test" Width="90" Height="26"
+                    Click="OnTestMicrophone" />
+        </Grid>
+        <ProgressBar x:Name="MicrophoneLevel" Height="6" Margin="0,8,0,0" Minimum="0" Maximum="1" Value="0" />
+        <TextBlock x:Name="MicrophoneTestText" Style="{StaticResource Note}"
+                   Text="Test records 4 seconds, shows the level and plays it back. Nothing is saved." />
+        <TextBlock x:Name="PrivacyLink" Style="{StaticResource Note}" Visibility="Collapsed">
+            <Hyperlink Click="OnOpenPrivacySettings">Open the Windows microphone privacy settings</Hyperlink>
+        </TextBlock>
+
+        <TextBlock Text="Dictation" Style="{StaticResource Section}" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Spoken language" Style="{StaticResource Label}" />
+                <ComboBox x:Name="LanguageBox" Height="26" DisplayMemberPath="Name"
+                          SelectionChanged="OnLanguageChanged" />
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+                <TextBlock Text="Clean-up" Style="{StaticResource Label}" />
+                <ComboBox x:Name="CleanupBox" Height="26" DisplayMemberPath="Name"
+                          SelectionChanged="OnCleanupChanged" />
+            </StackPanel>
+        </Grid>
+        <TextBlock x:Name="LanguageNote" Style="{StaticResource Note}" />
+        <TextBlock x:Name="CleanupNote" Style="{StaticResource Note}" />
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Persian style" Style="{StaticResource Label}" />
+                <ComboBox x:Name="PersianStyleBox" Height="26" DisplayMemberPath="Name"
+                          SelectionChanged="OnPersianStyleChanged" />
+            </StackPanel>
+        </Grid>
+        <TextBlock x:Name="PersianStyleNote" Style="{StaticResource Note}" />
+
+        <CheckBox x:Name="LineBreaksBox" Content="Allow line breaks in the inserted text" Margin="0,10,0,0" />
+        <TextBlock Text="Off by default: in chat apps a newline sends the message. LiveTranscribe never presses Enter."
+                   Style="{StaticResource Note}" />
+
+        <TextBlock Text="Translation to English" Style="{StaticResource Section}" />
+        <TextBlock Text="Model" Style="{StaticResource Label}" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <ComboBox x:Name="TranslationModelBox" Height="26" IsEditable="True" IsTextSearchEnabled="False"
+                      TextBoxBase.TextChanged="OnTranslationModelChanged" />
+            <Button x:Name="LoadTranslationModelsButton" Grid.Column="2" Content="Load list" Width="90" Height="26"
+                    Click="OnLoadTranslationModels" />
+        </Grid>
+        <TextBlock x:Name="TranslationRouteNote" Style="{StaticResource Note}" />
+        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+            <Button Content="Try and compare..." Width="130" Height="26" Click="OnTryTranslation" />
+        </StackPanel>
+        <TextBlock Text="Record a sentence and see what each model makes of it, how long it takes, and what it heard. The model saved here is the one every translated dictation uses: the translate key, the FA/EN switch on the pill, and &quot;Translate to English&quot; in its menu."
+                   Style="{StaticResource Note}" />
+
+        <TextBlock Text="Shortcuts" Style="{StaticResource Section}" />
+        <TextBlock Text="Hold to talk" Style="{StaticResource Label}" />
+        <StackPanel Orientation="Horizontal">
+            <TextBlock x:Name="HoldKeyText" Width="220" VerticalAlignment="Center" />
+            <Button x:Name="HoldKeyButton" Content="Change" Width="80" Height="24" Click="OnCaptureHoldKey" />
+        </StackPanel>
+
+        <TextBlock Text="Hold to translate to English" Style="{StaticResource Label}" />
+        <StackPanel Orientation="Horizontal">
+            <TextBlock x:Name="TranslateHoldText" Width="220" VerticalAlignment="Center" />
+            <Button x:Name="TranslateHoldButton" Content="Change" Width="80" Height="24" Click="OnCaptureTranslateHoldKey" />
+            <Button Content="Off" Width="50" Height="24" Margin="6,0,0,0" Click="OnClearTranslateHoldKey" />
+        </StackPanel>
+
+        <TextBlock Text="Hands-free (press to start, press to stop)" Style="{StaticResource Label}" />
+        <StackPanel Orientation="Horizontal">
+            <TextBlock x:Name="ToggleText" Width="220" VerticalAlignment="Center" />
+            <Button x:Name="ToggleButton" Content="Change" Width="80" Height="24" Click="OnCaptureToggle" />
+            <Button Content="Off" Width="50" Height="24" Margin="6,0,0,0" Click="OnClearToggle" />
+        </StackPanel>
+
+        <TextBlock Text="Translate hands-free" Style="{StaticResource Label}" />
+        <StackPanel Orientation="Horizontal">
+            <TextBlock x:Name="TranslateToggleText" Width="220" VerticalAlignment="Center" />
+            <Button x:Name="TranslateToggleButton" Content="Change" Width="80" Height="24" Click="OnCaptureTranslateToggle" />
+            <Button Content="Off" Width="50" Height="24" Margin="6,0,0,0" Click="OnClearTranslateToggle" />
+        </StackPanel>
+
+        <TextBlock Text="Paste last dictation again" Style="{StaticResource Label}" />
+        <StackPanel Orientation="Horizontal">
+            <TextBlock x:Name="PasteLastText" Width="220" VerticalAlignment="Center" />
+            <Button x:Name="PasteLastButton" Content="Change" Width="80" Height="24" Click="OnCapturePasteLast" />
+            <Button Content="Off" Width="50" Height="24" Margin="6,0,0,0" Click="OnClearPasteLast" />
+        </StackPanel>
+
+        <TextBlock x:Name="ShortcutsNote"
+                   Text="Click Change, then press the key you want. Every row can be a single key on its own (release it to record that), or a key held together with whichever of Ctrl, Alt and Shift you hold with it - hold those down, then press the key. For the two hold-to-talk rows, holding the modifier(s) down along with the key is what keeps the session open; letting go of any one of them ends it, same as letting go of the key itself. Esc cancels a capture in progress. The hold keys are reserved while LiveTranscribe runs; with Right Shift as the translate key, use Left Shift for capitals. If a dictation went to a window with no text field, click into the field and paste it again."
+                   Style="{StaticResource Note}" />
+
+        <TextBlock Text="Hands-free safety" Style="{StaticResource Section}" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="Maximum length" Style="{StaticResource Label}" />
+                <ComboBox x:Name="MaxLengthBox" Height="26" DisplayMemberPath="Name" />
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+                <CheckBox x:Name="StopOnSilenceBox" Content="Stop after silence" Margin="0,10,0,4" />
+                <ComboBox x:Name="SilenceBox" Height="26" DisplayMemberPath="Name" />
+            </StackPanel>
+        </Grid>
+
+        <TextBlock Text="Appearance" Style="{StaticResource Section}" />
+        <CheckBox x:Name="FloatingControlBox" Content="Show the floating control" Margin="0,6,0,0" />
+        <TextBlock Text="When hidden, a small Listening indicator still appears whenever the microphone is on."
+                   Style="{StaticResource Note}" />
+        <CheckBox x:Name="SoundsBox" Content="Play start and stop sounds" Margin="0,8,0,0" />
+
+        <TextBlock Text="Windows" Style="{StaticResource Section}" />
+        <CheckBox x:Name="LaunchAtSignInBox" Content="Start LiveTranscribe when I sign in to Windows" Margin="0,6,0,0" />
+        <TextBlock x:Name="LaunchAtSignInNote" Style="{StaticResource Note}"
+                   Text="Starts it for your Windows account only, with no administrator rights and no prompt at sign-in." />
+
+        <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
+            <Button Content="Save" Width="90" Height="28" Click="OnSave" IsDefault="True" />
+            <Button x:Name="RemoveKeyButton" Content="Remove key" Width="110" Height="28" Margin="8,0,0,0" Click="OnRemoveKey" />
+            <Button Content="Close" Width="90" Height="28" Margin="8,0,0,0" Click="OnClose" IsCancel="True" />
+        </StackPanel>
+        <TextBlock x:Name="SaveStatusText" Style="{StaticResource Note}" />
+
+        <Separator Margin="0,16,0,8" />
+        <TextBlock x:Name="PathsText" Style="{StaticResource Note}" />
+        <TextBlock Text="Free tier: Google may use submitted audio to improve its products. A paid key is not used that way."
+                   Style="{StaticResource Note}" />
+    </StackPanel>
+    </ScrollViewer>
+</Window>

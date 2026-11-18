@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <uses-permission android:name="android.permission.RECORD_AUDIO" />
+  <uses-permission android:name="android.permission.INTERNET" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+  <!-- No backup: the key is sealed to this phone's keystore and would not open anywhere else (FR-11.3). -->
+  <application android:label="LiveTranscribe" android:allowBackup="false" android:supportsRtl="true"
+               android:theme="@android:style/Theme.Material.Light.DarkActionBar" />
+</manifest>

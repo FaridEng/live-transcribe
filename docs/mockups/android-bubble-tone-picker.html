@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>LiveTranscribe — Android bubble menu mockup</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700&display=swap');
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: 'Vazirmatn', Tahoma, sans-serif;
+    background: #1c1e26;
+    color: #e8e8ec;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    padding: 32px;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  /* ---------- caption panel ---------- */
+  .caption {
+    width: 320px;
+    background: #262933;
+    border-radius: 14px;
+    padding: 20px 22px;
+    line-height: 2;
+    font-size: 15px;
+  }
+  .caption h1 {
+    font-size: 17px;
+    margin: 0 0 10px;
+    color: #7fd0ff;
+  }
+  .caption p { margin: 0 0 12px; }
+  .caption code {
+    background: #10121a;
+    border-radius: 6px;
+    padding: 1px 6px;
+    font-family: inherit;
+    color: #ffd479;
+    direction: ltr;
+    unicode-bidi: embed;
+  }
+  .caption .hint {
+    font-size: 13px;
+    color: #9aa0ad;
+    border-top: 1px dashed #3a3e4a;
+    padding-top: 12px;
+    margin-top: 12px;
+  }
+
+  /* ---------- phone frame ---------- */
+  .phone {
+    width: 320px;
+    height: 640px;
+    background: #0e0f14;
+    border-radius: 36px;
+    border: 10px solid #050507;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    flex-shrink: 0;
+  }
+  .statusbar {
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    font-size: 11px;
+    color: #8b8f9a;
+    direction: ltr;
+  }
+  .chatapp {
+    position: absolute;
+    inset: 28px 0 0 0;
+    background: linear-gradient(180deg, #14161d, #0e0f14 40%);
+  }
+  .chat-header {
+    height: 52px;
+    background: #1a1c24;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    gap: 10px;
+    direction: ltr;
+    font-size: 14px;
+    color: #cfd2da;
+    border-bottom: 1px solid #24262f;
+  }
+  .chat-header .avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: #3a4a63;
+  }
+  .bubbles { padding: 16px 14px; direction: ltr; }
+  .msg {
+    max-width: 72%;
+    padding: 9px 13px;
+    border-radius: 14px;
+    font-size: 13px;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  .msg.in  { background: #262a35; border-bottom-left-radius: 4px; }
+  .msg.out { background: #2b5c8a; margin-left: auto; border-bottom-right-radius: 4px; }
+  .field {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 54px;
+    background: #171922;
+    border-top: 1px solid #262933;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+    direction: ltr;
+    color: #7d828d;
+    font-size: 13px;
+  }
+
+  /* ---------- floating bubble + menu ---------- */
+  .bubble-anchor {
+    position: absolute;
+    top: 46%;
+    right: 10px;
+    z-index: 5;
+  }
+  .bubble {
+    width: 58px; height: 58px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #3d4250, #22242c);
+    border: 1px solid #454b5a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    cursor: pointer;
+    position: relative;
+    box-shadow: 0 6px 18px rgba(0,0,0,.45);
+    transition: box-shadow .2s, transform .15s;
+    user-select: none;
+  }
+  .bubble:active { transform: scale(.96); }
+  .bubble.open { box-shadow: 0 0 0 4px rgba(90,160,255,.25), 0 6px 18px rgba(0,0,0,.45); }
+
+  .badge-en {
+    position: absolute;
+    top: -6px; left: -6px;
+    background: #3b82f6;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 1px 5px;
+    direction: ltr;
+    opacity: 0;
+    transform: scale(.7);
+    transition: opacity .15s, transform .15s;
+  }
+  .badge-en.show { opacity: 1; transform: scale(1); }
+
+  .badge-note {
+    position: absolute;
+    bottom: -3px; right: -3px;
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #ffd479;
+    border: 2px solid #0e0f14;
+    opacity: 0;
+    transition: opacity .15s;
+  }
+  .badge-note.show { opacity: 1; }
+
+  /* menu grows to the LEFT of the bubble (inward from the right edge) */
+  .menu {
+    position: absolute;
+    top: 50%;
+    right: 74px;
+    transform: translateY(-50%) translateX(12px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .16s, transform .16s;
+    direction: ltr;
+    width: 236px;
+  }
+  .menu.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(-50%) translateX(0);
+  }
+
+  .seg {
+    display: flex;
+    background: #1c1e27;
+    border: 1px solid #30333e;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0,0,0,.35);
+  }
+  .seg button {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: #b7bac2;
+    font-family: inherit;
+    font-size: 12.5px;
+    padding: 10px 4px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    transition: background .12s, color .12s;
+  }
+  .seg button + button { border-left: 1px solid #30333e; }
+  .seg button .ic { font-size: 15px; }
+  .seg button.active {
+    background: #3b82f6;
+    color: #fff;
+    font-weight: 600;
+  }
+  .seg.output button.active { background: #10b981; }
+
+  .tone-row {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height .2s ease, opacity .2s ease, margin .2s ease;
+    margin-top: -8px;
+  }
+  .tone-row.show {
+    max-height: 60px;
+    opacity: 1;
+    margin-top: 0;
+  }
+  .tone-label {
+    font-size: 11px;
+    color: #8b8f9a;
+    margin: 2px 2px 4px;
+  }
+
+  .menu-item {
+    background: #1c1e27;
+    border: 1px solid #30333e;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #d6d8de;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 14px rgba(0,0,0,.35);
+    transition: background .12s;
+  }
+  .menu-item:hover { background: #262a35; }
+  .menu-item .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #ffd479;
+    opacity: 0;
+    transition: opacity .12s;
+  }
+  .menu-item .dot.show { opacity: 1; }
+  .menu-divider {
+    height: 1px;
+    background: #30333e;
+    margin: 2px 6px;
+  }
+  .menu-item.disabled { opacity: .4; pointer-events: none; }
+
+  .toolbar {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .toolbar .row { display: flex; gap: 8px; }
+  .toolbar button {
+    flex: 1;
+    background: #262933;
+    border: 1px solid #383c48;
+    color: #cfd2da;
+    border-radius: 10px;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .toolbar button.primary { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+</style>
+</head>
+<body>
+
+  <div class="caption">
+    <h1>پیشنمایش منوی long-press روی bubble</h1>
+    <p>این فایل یک شبیه‌سازی HTML از رفتار bubble شناور در نسخه‌ی اندرویده، فقط برای بررسی جای‌گیری دکمه‌های <code>Tone</code>. کد واقعی اپ عوض نشده؛ این صرفاً یک ماکت برای تایید طراحیه.</p>
+    <p>روی bubble کلیک کن تا منو باز شه (توی اپ واقعی این کار با نگه‌داشتن انگشت انجام می‌شه). ردیف اول خروجی رو بین <code>Persian</code> و <code>English</code> عوض می‌کنه؛ همین که <code>English</code> رو بزنی، ردیف <code>Tone</code> بلافاصله زیرش باز می‌شه، بدون این‌که لازم باشه به منوی دیگه‌ای بری.</p>
+    <p>سه گزینه‌ی لحن دقیقاً همون سه گزینه‌ای هستن که الان توی منوی pill نسخه‌ی ویندوز هست: <code>As spoken</code>، <code>Casual</code>، <code>Formal</code>. یکی همیشه انتخاب‌شده‌ست؛ زدن یکی از دو تای دیگه بلافاصله جایگزینش می‌کنه.</p>
+    <div class="hint">دکمه‌ی «Topic note…» و نقطه‌ی زردش، و ردیف‌های Retry / Paste last / Paste Persian هم توی همین ماکت هستن تا کل چیدمان با هم دیده شه.</div>
+  </div>
+
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●● 4G 100%</span></div>
+    <div class="chatapp">
+      <div class="chat-header"><div class="avatar"></div>Client chat</div>
+      <div class="bubbles">
+        <div class="msg in">Hey, any update on the delivery?</div>
+        <div class="msg out">Sorry for the delay, checking now.</div>
+      </div>
+      <div class="field">Type a message…</div>
+    </div>
+
+    <div class="bubble-anchor">
+      <div class="bubble" id="bubble" onclick="toggleMenu()">
+        🎙
+        <div class="badge-en" id="badgeEn">EN</div>
+        <div class="badge-note" id="badgeNote"></div>
+      </div>
+
+      <div class="menu" id="menu">
+        <div class="seg output">
+          <button id="btnFa" onclick="setOutput('fa')"><span class="ic">🇮🇷</span>Persian</button>
+          <button id="btnEn" onclick="setOutput('en')"><span class="ic">🇬🇧</span>English</button>
+        </div>
+
+        <div class="tone-row" id="toneRow">
+          <div class="tone-label">Tone</div>
+          <div class="seg">
+            <button id="toneAsSpoken" onclick="setTone('asspoken')"><span class="ic">🗣️</span>As spoken</button>
+            <button id="toneCasual" onclick="setTone('casual')"><span class="ic">🙂</span>Casual</button>
+            <button id="toneFormal" onclick="setTone('formal')"><span class="ic">🧑‍💼</span>Formal</button>
+          </div>
+        </div>
+
+        <div class="menu-item" onclick="toggleNote()">
+          <span>Topic note…</span>
+          <span class="dot" id="noteDot"></span>
+        </div>
+
+        <div class="menu-divider"></div>
+
+        <div class="menu-item">Retry</div>
+        <div class="menu-item">Paste last</div>
+        <div class="menu-item disabled">Paste Persian</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="caption" style="width:auto;">
+      <h1>کنترل دمو</h1>
+      <p>این دکمه‌ها فقط برای تست سریع سناریوها هستن، جزو UI واقعی نیستن.</p>
+    </div>
+    <div class="row">
+      <button class="primary" onclick="toggleMenu()">Open / close menu</button>
+    </div>
+    <div class="row">
+      <button onclick="setOutput('fa')">Simulate: Persian mode</button>
+      <button onclick="setOutput('en')">Simulate: English mode</button>
+    </div>
+  </div>
+
+<script>
+  let state = { menuOpen: false, output: 'fa', tone: 'asspoken', note: false };
+
+  function render() {
+    document.getElementById('menu').classList.toggle('open', state.menuOpen);
+    document.getElementById('bubble').classList.toggle('open', state.menuOpen);
+
+    document.getElementById('btnFa').classList.toggle('active', state.output === 'fa');
+    document.getElementById('btnEn').classList.toggle('active', state.output === 'en');
+
+    document.getElementById('toneRow').classList.toggle('show', state.output === 'en');
+    document.getElementById('badgeEn').classList.toggle('show', state.output === 'en');
+
+    document.getElementById('toneAsSpoken').classList.toggle('active', state.tone === 'asspoken');
+    document.getElementById('toneCasual').classList.toggle('active', state.tone === 'casual');
+    document.getElementById('toneFormal').classList.toggle('active', state.tone === 'formal');
+
+    document.getElementById('badgeNote').classList.toggle('show', state.note);
+    document.getElementById('noteDot').classList.toggle('show', state.note);
+  }
+
+  function toggleMenu() { state.menuOpen = !state.menuOpen; render(); }
+  function setOutput(v) { state.output = v; state.menuOpen = true; render(); }
+  function setTone(v) { state.tone = v; render(); }
+  function toggleNote() { state.note = !state.note; render(); }
+
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="app_name">LiveTranscribe</string>
+  <string name="accessibility_description">Shows the LiveTranscribe dictation button above the keyboard when a text field is focused, and puts the dictated text into that field. Nothing is shown in password fields. Audio goes to Gemini only while the button is listening; no text or audio is stored or logged.</string>
+</resources>
